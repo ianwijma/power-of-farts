@@ -9,8 +9,11 @@ public class PlayerGas {
     public static final String TAG_STORED = "storedGas";
     public static final String TAG_COOLDOWN = "fartCooldown";
 
+    private static final double FART_THRESHOLD = 0.01;
+
     private double pendingGas;
     private double storedGas;
+    private double excessGas;
     private int fartCooldownTicks;
 
     public double getPendingGas() {
@@ -60,18 +63,38 @@ public class PlayerGas {
         return filled;
     }
 
-    public void tickDigestion(double perTick, double capacity, FartListener fartListener) {
-        tickCooldown();
-        if (pendingGas <= 0) {
+    public void tickDigestion(double perTick, double capacity, FartListener fartListener) {        tickCooldown();
+        if (pendingGas <= 0 && excessGas <= 0) {
             return;
         }
         double moved = Math.min(perTick, pendingGas);
         pendingGas -= moved;
         storedGas += moved;
-        double vented = ventExcess(capacity);
-        if (vented > 0 && fartListener != null && !isCoolingDown()) {
+        double overflow = storedGas - capacity;
+        if (overflow > 0) {
+            // Body is full: what didn't fit builds up until it demands release
+            storedGas = capacity;
+            excessGas += overflow;
+        }
+        if (excessGas >= FART_THRESHOLD && fartListener != null && !isCoolingDown()) {
+            double vented = excessGas;
+            excessGas = 0;
             fartListener.onFart(vented);
             setFartCooldown(60);
+        }
+    }
+
+    private double lastSyncedStored = -1;
+    private double lastSyncedPending = -1;
+
+    public void syncIfNeeded(net.minecraft.server.level.ServerPlayer player) {
+        double roundedStored = Math.round(storedGas * 10.0) / 10.0;
+        double roundedPending = Math.round(pendingGas * 10.0) / 10.0;
+        if (roundedStored != lastSyncedStored || roundedPending != lastSyncedPending) {
+            lastSyncedStored = roundedStored;
+            lastSyncedPending = roundedPending;
+            com.ianwijma.poweroffarts.platform.Services.NETWORK.sendToPlayer(player,
+                    new com.ianwijma.poweroffarts.network.PlayerGasPayload(roundedStored, roundedPending));
         }
     }
 

@@ -63,7 +63,12 @@ neoforge/                      EnergyHandler (neoforge.transfer) adapters, capab
 
 ## Phases
 
-1. **Infra** — registration service, Gas/GasStack/registry, config, energy buffer. ✅ this commit
-2. **Core loop** — digestion mixin, player gas data, fart cloud, Gas Bag. Playtestable.
+1. **Infra** — registration service, Gas/GasStack/registry, config, energy buffer. ✅
+2. **Core loop** — digestion mixin, player gas data, fart cloud, Gas Bag. Playtestable. ✅
 3. **Machines** — Depositor → Pipe → Tank → Generator; Jade energy/gas views; JEI plugin flesh-out.
 4. **Polish** — models/textures, lang, recipes, datagen.
+5. **QA & HUD fixes** — current work:
+   - Fix: `poweroffarts:gas_bag` not usable on NeoForge (reproduced: `Unknown item`)
+   - Creative menu tab
+   - HUD above hunger bar: stored-gas icon with pending-gas outline (AppleSkin-style) + client sync packet
+   - Validate gas production end-to-end (`/pof validate` via FakePlayer, `/pof registry` dump, RCON-driven server tests)

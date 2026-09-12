@@ -9,4 +9,7 @@ import java.util.function.Supplier;
 public interface IPlatformRegistry {
 
     <T, V extends T> Supplier<V> register(Registry<T> registry, String name, Function<Identifier, V> factory);
+
+    default void commit() {
+    }
 }

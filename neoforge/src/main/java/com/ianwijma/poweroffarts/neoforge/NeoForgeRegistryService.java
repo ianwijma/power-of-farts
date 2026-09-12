@@ -19,7 +19,7 @@ public class NeoForgeRegistryService implements IPlatformRegistry {
     private static final NeoForgeRegistryService INSTANCE = new NeoForgeRegistryService();
 
     private final Map<Registry<?>, DeferredRegister<?>> registers = new HashMap<>();
-    private IEventBus modEventBus;
+    private static IEventBus modEventBus;
     private boolean committed;
 
     public static NeoForgeRegistryService instance() {
@@ -27,9 +27,11 @@ public class NeoForgeRegistryService implements IPlatformRegistry {
     }
 
     public static void init(IEventBus modEventBus) {
-        INSTANCE.modEventBus = modEventBus;
+        NeoForgeRegistryService.modEventBus = modEventBus;
+        Constants.LOG.info("NeoForgeRegistryService.init: bus captured");
     }
 
+    @Override
     public void commit() {
         if (committed) {
             return;
@@ -38,6 +40,8 @@ public class NeoForgeRegistryService implements IPlatformRegistry {
             throw new IllegalStateException("NeoForgeRegistryService.init must be called before commit");
         }
         committed = true;
+        registers.forEach((registry, deferred) ->
+                Constants.LOG.info("Committing DeferredRegister {} with {} entries", registry.key().identifier(), deferred.getEntries().size()));
         registers.values().forEach(register -> register.register(modEventBus));
     }
 

@@ -27,6 +27,6 @@ public final class FartHandler {
 
         player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_BURP, SoundSource.PLAYERS, 1.0F, 0.55F);
 
-        Constants.LOG.info("{} farted out {} FL!", player.getGameProfile().name(), String.format("%.1f", ventedGas));
+        Constants.LOG.info("{} farted out {} FL!", player.getGameProfile().name(), String.format("%.2f", ventedGas));
     }
 }

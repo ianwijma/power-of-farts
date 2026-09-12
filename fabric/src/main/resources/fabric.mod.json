@@ -13,6 +13,9 @@
     "entrypoints": {
         "main": [
             "com.ianwijma.poweroffarts.fabric.PowerOfFartsFabric"
+        ],
+        "client": [
+            "com.ianwijma.poweroffarts.fabric.client.PowerOfFartsFabricClient"
         ]
     },
     "mixins": [
