@@ -11,6 +11,7 @@ import net.minecraft.world.item.ItemStack;
 
 import com.ianwijma.poweroffarts.Constants;
 import com.ianwijma.poweroffarts.item.PofItems;
+import com.ianwijma.poweroffarts.machine.PofBlocks;
 
 public final class PofCreativeTabs {
 
@@ -18,7 +19,13 @@ public final class PofCreativeTabs {
             new CreativeModeTab.Builder(CreativeModeTab.Row.TOP, 0)
                     .title(Component.translatable("itemGroup.poweroffarts"))
                     .icon(() -> new ItemStack(PofItems.GAS_BAG.get()))
-                    .displayItems((parameters, output) -> output.accept(PofItems.GAS_BAG.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(PofItems.GAS_BAG.get());
+                        output.accept(new ItemStack(PofBlocks.DEPOSITOR.get()));
+                        output.accept(new ItemStack(PofBlocks.PIPE.get()));
+                        output.accept(new ItemStack(PofBlocks.GAS_TANK.get()));
+                        output.accept(new ItemStack(PofBlocks.GENERATOR.get()));
+                    })
                     .build());
 
     public static void touch() {

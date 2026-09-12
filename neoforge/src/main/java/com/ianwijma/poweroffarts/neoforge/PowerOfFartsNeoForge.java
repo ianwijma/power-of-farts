@@ -20,6 +20,7 @@ public class PowerOfFartsNeoForge {
         PofCreativeTabs.touch();
         NeoForge.EVENT_BUS.addListener(PofNeoForgeEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(PofNeoForgeEvents::onRegisterCommands);
+        eventBus.addListener(PofNeoForgeEvents::onRegisterCapabilities);
         Constants.LOG.info("Hello NeoForge world!");
         PowerOfFarts.init();
     }

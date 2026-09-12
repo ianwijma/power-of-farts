@@ -1,0 +1,12 @@
+{
+  "itemGroup.poweroffarts": "Power Of Farts",
+  "item.poweroffarts.gas_bag": "Gas Bag",
+  "block.poweroffarts.gas_depositor": "Gas Depositor",
+  "block.poweroffarts.gas_pipe": "Gas Pipe",
+  "block.poweroffarts.gas_tank": "Gas Tank",
+  "block.poweroffarts.fart_generator": "Fart Generator",
+  "tooltip.poweroffarts.gas_bag.contents": "Contents: %s / %s FL",
+  "tooltip.poweroffarts.gas_bag.use": "Right-click to collect, sneak-click to release",
+  "tooltip.poweroffarts.jade.gas": "Gas: %s / %s FL",
+  "tooltip.poweroffarts.jade.energy": "Energy: %s / %s FE"
+}

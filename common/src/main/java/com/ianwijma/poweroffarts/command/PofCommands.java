@@ -6,6 +6,7 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -61,6 +62,62 @@ public final class PofCommands {
                                     String.format("Pending gas: now %.1f FL", PlayerGasAccess.of(player).getPendingGas())), false);
                             return 1;
                         })));
+
+        root.then(Commands.literal("flowtest").executes(context -> {
+            CommandSourceStack source = context.getSource();
+            var level = source.getLevel();
+            BlockPos base = BlockPos.containing(source.getPosition()).above(2);
+
+            level.setBlock(base, com.ianwijma.poweroffarts.machine.PofBlocks.DEPOSITOR.get().defaultBlockState(), 3);
+            level.setBlock(base.east(), com.ianwijma.poweroffarts.machine.PofBlocks.PIPE.get().defaultBlockState(), 3);
+            level.setBlock(base.east(2), com.ianwijma.poweroffarts.machine.PofBlocks.GAS_TANK.get().defaultBlockState(), 3);
+            level.setBlock(base.east(3), com.ianwijma.poweroffarts.machine.PofBlocks.GENERATOR.get().defaultBlockState(), 3);
+
+            var depositor = (com.ianwijma.poweroffarts.machine.GasDepositorBlockEntity) level.getBlockEntity(base);
+            var pipe = (com.ianwijma.poweroffarts.machine.GasPipeBlockEntity) level.getBlockEntity(base.east());
+            var tank = (com.ianwijma.poweroffarts.machine.GasTankBlockEntity) level.getBlockEntity(base.east(2));
+            var generator = (com.ianwijma.poweroffarts.machine.FartGeneratorBlockEntity) level.getBlockEntity(base.east(3));
+            if (depositor == null || pipe == null || tank == null || generator == null) {
+                source.sendFailure(Component.literal("flowtest: block entities missing"));
+                return 0;
+            }
+
+            // Simulate a full gas bag inserted into the depositor
+            double inserted = 500.0;
+            com.ianwijma.poweroffarts.gas.Gas farts = com.ianwijma.poweroffarts.gas.PofGases.FARTS.get();
+            double remaining = inserted;
+            for (int tick = 0; tick < 600; tick++) {
+                if (remaining > 0) {
+                    double drained = Math.min(remaining, com.ianwijma.poweroffarts.config.PofConfig.get().depositorTransferRate);
+                    double accepted = depositor.getTank().insert(farts, drained, false);
+                    remaining -= accepted;
+                }
+                depositor.serverTick(level);
+                pipe.serverTick(level);
+                tank.serverTick(level);
+            }
+            double depEnd = depositor.getTank().getAmount();
+            double pipeEnd = pipe.getTank().getAmount();
+            double tankEnd = tank.getTank().getAmount();
+            double leftover = remaining;
+            boolean transportOk = Math.abs(depEnd + pipeEnd + tankEnd + leftover - inserted) < 0.5;
+            source.sendSuccess(() -> Component.literal(String.format(
+                    "transport: dep %.1f, pipe %.1f, tank %.1f, undelivered %.1f | conservation %s",
+                    depEnd, pipeEnd, tankEnd, leftover, transportOk ? "OK" : "FAIL")), false);
+
+            // Phase 2: generator burns gas into energy
+            generator.getTank().insert(farts, 100.0, false);
+            for (int tick = 0; tick < 100; tick++) {
+                generator.serverTick(level);
+            }
+            double genGasLeft = generator.getTank().getAmount();
+            long genEnergy = generator.getEnergy().getEnergyStored();
+            boolean genOk = Math.abs((100.0 - genGasLeft) * 5.0 - genEnergy) < 1.0;
+            source.sendSuccess(() -> Component.literal(String.format(
+                    "generator: gas %.1f/100, energy %d FE | burn %s",
+                    genGasLeft, genEnergy, genOk ? "OK" : "FAIL")), false);
+            return 1;
+        }));
 
         root.then(Commands.literal("validate").executes(context -> {
             CommandSourceStack source = context.getSource();

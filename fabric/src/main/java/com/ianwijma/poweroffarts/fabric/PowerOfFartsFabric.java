@@ -18,6 +18,10 @@ public class PowerOfFartsFabric implements ModInitializer {
         PofRegistries.init();
         PofCreativeTabs.touch();
         PofConfig.load();
+        team.reborn.energy.api.EnergyStorage.SIDED.registerForBlockEntities((be, direction) ->
+                        be instanceof com.ianwijma.poweroffarts.machine.FartGeneratorBlockEntity generator
+                                ? new com.ianwijma.poweroffarts.fabric.GeneratorEnergyStorage(generator) : null,
+                com.ianwijma.poweroffarts.machine.PofBlockEntities.GENERATOR.get());
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 DigestionSystem.tickPlayer(player);

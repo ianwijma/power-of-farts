@@ -39,6 +39,10 @@ public class SimpleEnergyBuffer {
         return stored;
     }
 
+    public void setStored(long amount) {
+        stored = Math.max(0, Math.min(capacity, amount));
+    }
+
     public long getMaxEnergyStored() {
         return capacity;
     }

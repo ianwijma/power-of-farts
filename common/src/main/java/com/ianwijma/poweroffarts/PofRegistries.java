@@ -3,6 +3,8 @@ package com.ianwijma.poweroffarts;
 import com.ianwijma.poweroffarts.gas.PofGases;
 import com.ianwijma.poweroffarts.item.PofDataComponents;
 import com.ianwijma.poweroffarts.item.PofItems;
+import com.ianwijma.poweroffarts.machine.PofBlockEntities;
+import com.ianwijma.poweroffarts.machine.PofBlocks;
 
 public final class PofRegistries {
 
@@ -16,6 +18,8 @@ public final class PofRegistries {
         PofGases.touch();
         PofDataComponents.touch();
         PofItems.touch();
+        PofBlocks.touch();
+        PofBlockEntities.touch();
     }
 
     private PofRegistries() {

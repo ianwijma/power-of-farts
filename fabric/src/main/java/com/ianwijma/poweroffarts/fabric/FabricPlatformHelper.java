@@ -4,8 +4,11 @@ import com.ianwijma.poweroffarts.platform.services.IPlatformHelper;
 import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import team.reborn.energy.api.EnergyStorage;
 
 import java.nio.file.Path;
 import java.util.UUID;
@@ -35,5 +38,21 @@ public class FabricPlatformHelper implements IPlatformHelper {
     @Override
     public ServerPlayer createFakePlayer(ServerLevel level) {
         return FakePlayer.get(level, new GameProfile(UUID.randomUUID(), "pof-validator"));
+    }
+
+    @Override
+    public long pushEnergy(ServerLevel level, BlockPos sourcePos, Direction direction, long amount) {
+        EnergyStorage target = EnergyStorage.SIDED.find(level, sourcePos.relative(direction), direction.getOpposite());
+        if (target == null || amount <= 0) {
+            return 0;
+        }
+        try (net.fabricmc.fabric.api.transfer.v1.transaction.Transaction transaction =
+                     net.fabricmc.fabric.api.transfer.v1.transaction.Transaction.openOuter()) {
+            long inserted = target.insert(amount, transaction);
+            if (inserted > 0) {
+                transaction.commit();
+            }
+            return inserted;
+        }
     }
 }
