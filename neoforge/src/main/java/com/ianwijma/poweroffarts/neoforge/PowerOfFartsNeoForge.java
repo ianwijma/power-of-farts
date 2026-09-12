@@ -1,7 +1,9 @@
 package com.ianwijma.poweroffarts.neoforge;
 
 import com.ianwijma.poweroffarts.Constants;
+import com.ianwijma.poweroffarts.PofRegistries;
 import com.ianwijma.poweroffarts.PowerOfFarts;
+import com.ianwijma.poweroffarts.config.PofConfig;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 
@@ -9,6 +11,10 @@ import net.neoforged.fml.common.Mod;
 public class PowerOfFartsNeoForge {
 
     public PowerOfFartsNeoForge(IEventBus eventBus) {
+        NeoForgeRegistryService.init(eventBus);
+        PofRegistries.init();
+        NeoForgeRegistryService.instance().commit();
+        PofConfig.load();
         Constants.LOG.info("Hello NeoForge world!");
         PowerOfFarts.init();
     }
