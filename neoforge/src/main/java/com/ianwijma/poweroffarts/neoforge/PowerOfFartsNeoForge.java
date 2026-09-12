@@ -6,6 +6,7 @@ import com.ianwijma.poweroffarts.PowerOfFarts;
 import com.ianwijma.poweroffarts.config.PofConfig;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.common.NeoForge;
 
 @Mod(Constants.MOD_ID)
 public class PowerOfFartsNeoForge {
@@ -15,6 +16,7 @@ public class PowerOfFartsNeoForge {
         PofRegistries.init();
         NeoForgeRegistryService.instance().commit();
         PofConfig.load();
+        NeoForge.EVENT_BUS.addListener(PofNeoForgeEvents::onPlayerTick);
         Constants.LOG.info("Hello NeoForge world!");
         PowerOfFarts.init();
     }
