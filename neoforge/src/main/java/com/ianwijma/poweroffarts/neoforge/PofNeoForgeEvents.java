@@ -29,5 +29,9 @@ public class PofNeoForgeEvents {
     public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, PofBlockEntities.GENERATOR.get(),
                 (generator, direction) -> new GeneratorEnergyHandler(generator));
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, PofBlockEntities.PIPE.get(),
+                (pipe, direction) -> new GasTankFluidHandler(pipe.getTank()));
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, PofBlockEntities.GAS_TANK.get(),
+                (tank, direction) -> new GasTankFluidHandler(tank.getTank()));
     }
 }

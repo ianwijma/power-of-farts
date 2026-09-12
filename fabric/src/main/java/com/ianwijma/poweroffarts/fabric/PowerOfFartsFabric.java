@@ -22,6 +22,11 @@ public class PowerOfFartsFabric implements ModInitializer {
                         be instanceof com.ianwijma.poweroffarts.machine.FartGeneratorBlockEntity generator
                                 ? new com.ianwijma.poweroffarts.fabric.GeneratorEnergyStorage(generator) : null,
                 com.ianwijma.poweroffarts.machine.PofBlockEntities.GENERATOR.get());
+        net.fabricmc.fabric.api.transfer.v1.fluid.FluidStorage.SIDED.registerForBlockEntities((be, direction) ->
+                        be instanceof com.ianwijma.poweroffarts.machine.GasMachineBlockEntity machine
+                                ? new com.ianwijma.poweroffarts.fabric.GasTankFluidStorage(machine.getTank()) : null,
+                com.ianwijma.poweroffarts.machine.PofBlockEntities.PIPE.get(),
+                com.ianwijma.poweroffarts.machine.PofBlockEntities.GAS_TANK.get());
         ServerTickEvents.END_SERVER_TICK.register(server -> {
             for (ServerPlayer player : server.getPlayerList().getPlayers()) {
                 DigestionSystem.tickPlayer(player);

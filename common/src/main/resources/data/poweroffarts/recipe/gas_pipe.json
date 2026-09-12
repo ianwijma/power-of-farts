@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "I": "minecraft:iron_ingot",
+    "G": "minecraft:glass"
+  },
+  "pattern": [
+    "IGI"
+  ],
+  "result": {
+    "id": "poweroffarts:gas_pipe",
+    "count": 4
+  }
+}

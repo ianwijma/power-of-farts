@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 
 import com.ianwijma.poweroffarts.gas.Gas;
 import com.ianwijma.poweroffarts.gas.GasTank;
+import com.ianwijma.poweroffarts.platform.Services;
 
 public abstract class GasMachineBlockEntity extends BlockEntity implements IGasAcceptor {
 
@@ -57,6 +58,10 @@ public abstract class GasMachineBlockEntity extends BlockEntity implements IGasA
                 return;
             }
             double pushed = insertIntoNeighbor(level, worldPosition.relative(direction), direction.getOpposite(), tank.getGas(), offered);
+            if (pushed <= 0) {
+                // Not one of our machines: try pushing out to foreign fluid tanks
+                pushed = Services.PLATFORM.pushGasToFluidTank(level, worldPosition.relative(direction), direction.getOpposite(), tank.getGas(), offered);
+            }
             if (pushed > 0) {
                 tank.extract(pushed, false);
                 remaining -= pushed;

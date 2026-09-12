@@ -65,6 +65,11 @@ neoforge/                      EnergyHandler (neoforge.transfer) adapters, capab
 
 1. **Infra** — registration service, Gas/GasStack/registry, config, energy buffer. ✅
 2. **Core loop** — digestion mixin, player gas data, fart cloud, Gas Bag. Playtestable. ✅
-3. **Machines** — Depositor → Pipe → Tank → Generator + Jade tooltips. ✅ Validated via `/pof flowtest` on both loaders (500 FL transport conserved; 100 FL → 500 FE burn). Fluid-as-gas interop (`#poweroffarts:gas_fluids`) still pending.
-4. **Polish** — recipes, better textures, tank fill rendering, datagen.
+3. **Machines** — Depositor → Pipe → Tank → Generator + Jade tooltips. ✅ Validated via `/pof flowtest` on both loaders (500 FL transport conserved; 100 FL → 500 FE burn).
+4. **Polish** — ✅ Recipes (bag + all 4 machines), proper item/block textures, fluid-as-gas interop:
+   - `#poweroffarts:gas_fluids` tag (`minecraft:lava` as placeholder; modpacks add real gas fluids)
+   - Foreign pumps push tagged fluids into our pipes/tanks (1 mB = 1 FL → `FluidGas`), foreign tanks receive FluidGas back
+   - Exposed via NeoForge `ResourceHandler<FluidResource>` / Fabric `Storage<FluidVariant>`
+   - Validated via `/pof fluidtest` on both loaders (tag rejection, inbound conversion, outbound bridge)
+   - Known limitation: fluid adapters mutate directly (no transaction rollback for foreign mods' aborted transactions)
 5. **QA & HUD fixes** — NeoForge registration fix, creative tab, HUD + sync, `/pof` debug suite. ✅

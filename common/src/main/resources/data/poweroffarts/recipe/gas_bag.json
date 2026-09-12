@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    "minecraft:leather",
+    "minecraft:leather",
+    "minecraft:string"
+  ],
+  "result": {
+    "id": "poweroffarts:gas_bag"
+  }
+}

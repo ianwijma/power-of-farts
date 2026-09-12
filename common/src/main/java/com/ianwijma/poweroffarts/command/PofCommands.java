@@ -7,12 +7,15 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.permissions.Permissions;
+import net.minecraft.world.level.material.Fluids;
 
 import com.ianwijma.poweroffarts.config.PofConfig;
+import com.ianwijma.poweroffarts.gas.Gas;
 import com.ianwijma.poweroffarts.gas.Gases;
 import com.ianwijma.poweroffarts.platform.Services;
 import com.ianwijma.poweroffarts.player.DigestionSystem;
@@ -68,6 +71,13 @@ public final class PofCommands {
             var level = source.getLevel();
             BlockPos base = BlockPos.containing(source.getPosition()).above(2);
 
+            for (int dx = -2; dx <= 5; dx++) {
+                for (int dy = -1; dy <= 4; dy++) {
+                    for (int dz = -4; dz <= 4; dz++) {
+                        level.setBlock(base.offset(dx, dy, dz), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+                    }
+                }
+            }
             level.setBlock(base, com.ianwijma.poweroffarts.machine.PofBlocks.DEPOSITOR.get().defaultBlockState(), 3);
             level.setBlock(base.east(), com.ianwijma.poweroffarts.machine.PofBlocks.PIPE.get().defaultBlockState(), 3);
             level.setBlock(base.east(2), com.ianwijma.poweroffarts.machine.PofBlocks.GAS_TANK.get().defaultBlockState(), 3);
@@ -116,6 +126,52 @@ public final class PofCommands {
             source.sendSuccess(() -> Component.literal(String.format(
                     "generator: gas %.1f/100, energy %d FE | burn %s",
                     genGasLeft, genEnergy, genOk ? "OK" : "FAIL")), false);
+            return 1;
+        }));
+
+        root.then(Commands.literal("fluidtest").executes(context -> {
+            CommandSourceStack source = context.getSource();
+            var level = (net.minecraft.server.level.ServerLevel) source.getLevel();
+            BlockPos base = BlockPos.containing(source.getPosition()).above(4).north(3);
+
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 2; dy++) {
+                    for (int dz = -1; dz <= 1; dz++) {
+                        level.setBlock(base.offset(dx, dy, dz), net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), 3);
+                    }
+                }
+            }
+            level.setBlock(base, com.ianwijma.poweroffarts.machine.PofBlocks.GAS_TANK.get().defaultBlockState(), 3);
+            level.setBlock(base.below(), net.minecraft.world.level.block.Blocks.CAULDRON.defaultBlockState(), 3);
+
+            var tank = (com.ianwijma.poweroffarts.machine.GasTankBlockEntity) level.getBlockEntity(base);
+            if (tank == null) {
+                source.sendFailure(Component.literal("fluidtest: tank BE missing"));
+                return 0;
+            }
+
+            // 1. Tag enforcement: water is NOT in #poweroffarts:gas_fluids, so a foreign
+            //    pump pushing untagged fluid must be rejected
+            double rejected = Services.PLATFORM.insertGasFluid(level, base, Direction.UP, Fluids.WATER, 100);
+            boolean tagOk = rejected == 0;
+
+            // 2. Tagged fluid (lava placeholder): inbound via the real fluid APIs a
+            //    foreign mod would use, converted 1 mB = 1 FL into FluidGas
+            double gained = Services.PLATFORM.insertGasFluid(level, base, Direction.UP, Fluids.LAVA, 100);
+            boolean inboundOk = Math.abs(gained - 100.0) < 0.5;
+            double stored = tank.getTank().getAmount();
+
+            // 3. Outbound: bridge push of that FluidGas, converting back to fluid,
+            //    into the pipe below through its exposed fluid handler
+            Gas lavaGas = com.ianwijma.poweroffarts.gas.FluidGases.forFluid(Fluids.LAVA);
+            level.setBlock(base.below(), com.ianwijma.poweroffarts.machine.PofBlocks.PIPE.get().defaultBlockState(), 3);
+            double directPush = Services.PLATFORM.pushGasToFluidTank(level, base.below(), Direction.UP, lavaGas, 50.0);
+
+            source.sendSuccess(() -> Component.literal(String.format(
+                    "fluid: tag-rejection %s, inbound lava %.0f mB (%s), bridge push %.0f mB (%s), platform %s",
+                    tagOk ? "OK" : "FAIL", gained, inboundOk ? "OK" : "FAIL",
+                    directPush, directPush > 0 ? "OK" : "FAIL",
+                    Services.PLATFORM.getPlatformName())), false);
             return 1;
         }));
 

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "L": "minecraft:leather",
+    "P": "poweroffarts:gas_pipe"
+  },
+  "pattern": [
+    "LLL",
+    "LPL",
+    "LLL"
+  ],
+  "result": {
+    "id": "poweroffarts:gas_depositor"
+  }
+}

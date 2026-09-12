@@ -2,7 +2,10 @@ package com.ianwijma.poweroffarts.gas;
 
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
@@ -74,7 +77,9 @@ public class GasTank {
 
     public void save(ValueOutput output) {
         output.putDouble(TAG_AMOUNT, amount);
-        if (gas != null) {
+        if (gas instanceof FluidGas fluidGas) {
+            output.putString(TAG_GAS, "fluid:" + BuiltInRegistries.FLUID.getKey(fluidGas.getFluid()));
+        } else if (gas != null) {
             Identifier id = Gases.REGISTRY.getKey(gas);
             if (id != null) {
                 output.putString(TAG_GAS, id.toString());
@@ -86,6 +91,16 @@ public class GasTank {
         amount = input.getDoubleOr(TAG_AMOUNT, 0.0);
         gas = null;
         String gasId = input.getStringOr(TAG_GAS, "");
+        if (gasId.startsWith("fluid:")) {
+            Identifier fluidId = Identifier.tryParse(gasId.substring("fluid:".length()));
+            if (fluidId != null) {
+                Fluid fluid = BuiltInRegistries.FLUID.getValue(fluidId);
+                if (fluid != null && fluid != Fluids.EMPTY) {
+                    gas = FluidGases.forFluid(fluid);
+                }
+            }
+            return;
+        }
         if (!gasId.isEmpty()) {
             Identifier id = Identifier.tryParse(gasId);
             if (id != null && id.getNamespace().equals(Constants.MOD_ID)) {
