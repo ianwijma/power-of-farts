@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "poweroffarts:block/gas_pipe"
+    "model": "poweroffarts:block/gas_pipe_inventory"
   }
 }

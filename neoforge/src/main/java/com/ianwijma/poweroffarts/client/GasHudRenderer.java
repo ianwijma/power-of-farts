@@ -9,7 +9,7 @@ import com.ianwijma.poweroffarts.config.PofConfig;
 
 public final class GasHudRenderer {
 
-    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/gas_hud.png");
+    private static final Identifier TEXTURE = Identifier.fromNamespaceAndPath(Constants.MOD_ID, "textures/gui/sprites/gas_hud.png");
     private static final int ICONS = 10;
     private static final int ICON_SIZE = 9;
     private static final int FILLED_U = 0;

@@ -23,9 +23,17 @@ public final class PofBlocks {
     public static final Supplier<Block> GENERATOR = registerMachine("fart_generator", FartGeneratorBlockEntity::new);
 
     private static Supplier<Block> registerMachine(String name, BlockEntityType.BlockEntitySupplier<? extends BlockEntity> beFactory) {
-        Supplier<Block> block = Services.REGISTRY.register(BuiltInRegistries.BLOCK, name, id ->
-                new MachineBlock(BlockBehaviour.Properties.of().strength(1.5F)
-                        .setId(ResourceKey.create(Registries.BLOCK, id)), beFactory));
+        Supplier<Block> block = Services.REGISTRY.register(BuiltInRegistries.BLOCK, name, id -> {
+            BlockBehaviour.Properties properties = BlockBehaviour.Properties.of().strength(1.5F)
+                    .setId(ResourceKey.create(Registries.BLOCK, id));
+            Block machine;
+            if (name.equals("gas_pipe")) {
+                machine = new PipeBlock(properties.noOcclusion().dynamicShape(), beFactory);
+            } else {
+                machine = new MachineBlock(properties, beFactory);
+            }
+            return machine;
+        });
         Services.REGISTRY.register(BuiltInRegistries.ITEM, name, itemId ->
                 new BlockItem(block.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, itemId))));
         return block;

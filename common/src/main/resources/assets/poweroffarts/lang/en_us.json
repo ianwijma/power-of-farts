@@ -6,7 +6,7 @@
   "block.poweroffarts.gas_tank": "Gas Tank",
   "block.poweroffarts.fart_generator": "Fart Generator",
   "tooltip.poweroffarts.gas_bag.contents": "Contents: %s / %s FL",
-  "tooltip.poweroffarts.gas_bag.use": "Right-click to collect, sneak-click to release",
+  "tooltip.poweroffarts.gas_bag.use": "Right-click to collect, sneak-click to fart it all out",
   "tooltip.poweroffarts.jade.gas": "Gas: %s / %s FL",
   "tooltip.poweroffarts.jade.energy": "Energy: %s / %s FE"
 }

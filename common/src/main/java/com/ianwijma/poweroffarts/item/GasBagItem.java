@@ -3,6 +3,7 @@ package com.ianwijma.poweroffarts.item;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
@@ -15,6 +16,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.Level;
 
 import com.ianwijma.poweroffarts.config.PofConfig;
+import com.ianwijma.poweroffarts.player.FartHandler;
 import com.ianwijma.poweroffarts.player.PlayerGas;
 import com.ianwijma.poweroffarts.player.PlayerGasAccess;
 
@@ -44,10 +46,9 @@ public class GasBagItem extends Item {
             PofConfig config = PofConfig.get();
             if (player.isShiftKeyDown()) {
                 double released = getGas(stack);
-                if (released > 0) {
-                    double filled = gas.fillStored(released, config.playerGasCapacity);
-                    setGas(stack, released - filled);
-                    level.playSound(null, player.blockPosition(), SoundEvents.BOTTLE_EMPTY, SoundSource.PLAYERS, 0.8F, 1.2F);
+                if (released > 0 && player instanceof ServerPlayer serverPlayer) {
+                    setGas(stack, 0);
+                    FartHandler.fart(serverPlayer, released);
                 }
             } else {
                 double stored = gas.getStoredGas();

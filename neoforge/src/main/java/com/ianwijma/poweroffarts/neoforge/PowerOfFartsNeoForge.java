@@ -15,12 +15,13 @@ public class PowerOfFartsNeoForge {
     public PowerOfFartsNeoForge(IEventBus eventBus) {
         NeoForgeRegistryService.init(eventBus);
         PofRegistries.init();
+        PofCreativeTabs.touch();
         Services.REGISTRY.commit();
         PofConfig.load();
-        PofCreativeTabs.touch();
         NeoForge.EVENT_BUS.addListener(PofNeoForgeEvents::onPlayerTick);
         NeoForge.EVENT_BUS.addListener(PofNeoForgeEvents::onRegisterCommands);
         eventBus.addListener(PofNeoForgeEvents::onRegisterCapabilities);
+        eventBus.addListener(PofPayloadHandlers::onRegisterPayloads);
         Constants.LOG.info("Hello NeoForge world!");
         PowerOfFarts.init();
     }
